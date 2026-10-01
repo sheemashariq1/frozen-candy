@@ -18,12 +18,14 @@ const allowedYears = new Set(['1st Year', '2nd Year', '3rd Year', '4th Year', 'O
 let pool;
 
 app.disable('x-powered-by');
+app.set('trust proxy', 1); // Vercel sits behind a proxy; use the real client IP for rate limiting
 app.use(express.json({ limit: '2mb' }));
 app.use(rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 10,
+    limit: Number(process.env.RATE_LIMIT_MAX) || 100, // many students may share one campus Wi-Fi IP
     standardHeaders: 'draft-7',
-    legacyHeaders: false
+    legacyHeaders: false,
+    message: { error: 'Too many attempts. Please wait a few minutes and try again.' }
 }));
 
 function getPool() {
@@ -41,6 +43,23 @@ function getPool() {
 app.use(async (request, response) => {
     response.setHeader('Cache-Control', 'no-store');
     response.setHeader('X-Content-Type-Options', 'nosniff');
+
+    // Diagnostic: open /api/members in a browser to see if the function, env vars and database are working.
+    if (request.method === 'GET') {
+        const status = {
+            ok: false,
+            databaseConfigured: Boolean(process.env.DATABASE_URL),
+            emailDomainConfigured: Boolean(process.env.ACCOUNT_EMAIL_DOMAIN)
+        };
+        if (!status.databaseConfigured) return response.status(503).json({ ...status, database: 'DATABASE_URL is not set' });
+        try {
+            await getPool().query('select 1 from public.members limit 1');
+            return response.json({ ...status, ok: true, database: 'connected' });
+        } catch (error) {
+            console.error('Health check failed:', error.code || error.name, error.message);
+            return response.status(503).json({ ...status, database: 'error', code: error.code || error.name });
+        }
+    }
 
     if (request.method !== 'POST') {
         return response.status(405).json({ error: 'Method not allowed.' });
@@ -99,7 +118,7 @@ app.use(async (request, response) => {
         if (error.code === '23505') {
             return response.status(409).json({ error: 'An account already exists for this member.' });
         }
-        console.error('Member creation failed:', error.message);
+        console.error('Member creation failed:', error.code || error.name, error.message);
         return response.status(500).json({ error: 'Could not save the member profile. Please try again.' });
     }
 });

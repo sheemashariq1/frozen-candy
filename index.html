@@ -1407,7 +1407,7 @@
                 <div class="progress-box">
                     <div class="progress-labels">
                         <span>ORIENTATION PROGRESS</span>
-                        <span id="progress-status-text">0 / 5 ACTIVITIES COMPLETED</span>
+                        <span id="progress-status-text">0 / 4 ACTIVITIES COMPLETED</span>
                     </div>
                     <div class="progress-track">
                         <div class="progress-fill" id="progress-fill-bar"></div>
@@ -1457,10 +1457,10 @@
                             <span class="act-badge badge-locked" id="act-badge-3"><i class="fa-solid fa-lock"></i>
                                 LOCKED</span>
                         </div>
-                        <h3 class="act-title">RANDOM CHITS</h3>
-                        <p class="act-desc">Pick a random chit and complete the challenge written on it.</p>
+                        <h3 class="act-title">HUMAN BINGO</h3>
+                        <p class="act-desc">Find people who match the statements and complete your bingo.</p>
                     </div>
-                    <button type="button" class="btn-act-unlock" onclick="openCodeModal('chits', 'RANDOM CHITS')">
+                    <button type="button" class="btn-act-unlock" onclick="openCodeModal('bingo', 'HUMAN BINGO')">
                         ENTER ACTIVITY CODE
                     </button>
                 </div>
@@ -1471,22 +1471,6 @@
                         <div class="act-header">
                             <span class="act-tag">ACTIVITY 04</span>
                             <span class="act-badge badge-locked" id="act-badge-4"><i class="fa-solid fa-lock"></i>
-                                LOCKED</span>
-                        </div>
-                        <h3 class="act-title">HUMAN BINGO</h3>
-                        <p class="act-desc">Find people who match the statements and complete your bingo.</p>
-                    </div>
-                    <button type="button" class="btn-act-unlock" onclick="openCodeModal('bingo', 'HUMAN BINGO')">
-                        ENTER ACTIVITY CODE
-                    </button>
-                </div>
-
-                <!-- Activity 5 -->
-                <div class="activity-card" id="act-card-5">
-                    <div>
-                        <div class="act-header">
-                            <span class="act-tag">ACTIVITY 05</span>
-                            <span class="act-badge badge-locked" id="act-badge-5"><i class="fa-solid fa-lock"></i>
                                 LOCKED</span>
                         </div>
                         <h3 class="act-title">COMMON GROUND</h3>
@@ -1717,7 +1701,6 @@
         const ACTIVITY_CODES = {
             introduce: "INTRO26",
             bottle: "BOTTLE26",
-            chits: "CHITS26",
             bingo: "BINGO26",
             commonGround: "GROUND26"
         };
@@ -1728,7 +1711,6 @@
             completedActivities: {
                 introduce: false,
                 bottle: false,
-                chits: false,
                 bingo: false,
                 commonGround: false
             },
@@ -1766,7 +1748,17 @@
                         avatarDataUrl: photo
                     })
                 });
-                const result = await response.json();
+                const responseText = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch {
+                    const message = responseText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 180);
+                    const hint = response.status === 403
+                        ? ' Check Vercel Deployment Protection and use the production domain.'
+                        : '';
+                    throw new Error(`Server returned HTTP ${response.status}${message ? `: ${message}` : '.'}${hint}`);
+                }
                 if (!response.ok) throw new Error(result.error || 'Could not create your account.');
 
                 createdMemberId = result.member.id;
@@ -1865,15 +1857,14 @@
             if (userGreeting) userGreeting.textContent = `WELCOME, ${userPassport.name.toUpperCase()}`;
 
             const count = getCompletedCount();
-            if (progressText) progressText.textContent = `${count} / 5 ACTIVITIES COMPLETED`;
-            if (progressFill) progressFill.style.width = `${(count / 5) * 100}%`;
+            if (progressText) progressText.textContent = `${count} / 4 ACTIVITIES COMPLETED`;
+            if (progressFill) progressFill.style.width = `${(count / 4) * 100}%`;
 
             const mapping = [
                 { key: 'introduce', num: 1 },
                 { key: 'bottle', num: 2 },
-                { key: 'chits', num: 3 },
-                { key: 'bingo', num: 4 },
-                { key: 'commonGround', num: 5 }
+                { key: 'bingo', num: 3 },
+                { key: 'commonGround', num: 4 }
             ];
 
             mapping.forEach(item => {
@@ -1895,7 +1886,7 @@
             });
 
             if (unlockCard) {
-                if (count === 5) {
+                if (count === 4) {
                     unlockCard.classList.add('show');
                 } else {
                     unlockCard.classList.remove('show');
@@ -1958,7 +1949,7 @@
                 localStorage.removeItem('cc_jmi_orientation_state');
                 userPassport = {
                     name: "",
-                    completedActivities: { introduce: false, bottle: false, chits: false, bingo: false, commonGround: false },
+                    completedActivities: { introduce: false, bottle: false, bingo: false, commonGround: false },
                     avatarDataUrl: null
                 };
                 const inp = document.getElementById('user-name-input');
