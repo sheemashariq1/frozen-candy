@@ -90,17 +90,28 @@ app.use(async (request, response) => {
 
     try {
         const memberId = crypto.randomUUID();
-        const email = `member-${memberId.slice(0, 12)}@${emailDomain}`;
         const password = crypto.randomBytes(18).toString('base64url');
         const passwordHash = await bcrypt.hash(password, 12);
-        const result = await getPool().query(
-            `INSERT INTO members
+        const base = fullName.normalize('NFKD').toLowerCase()
+            .replace(/[^a-z0-9]+/g, '.').slice(0, 30).replace(/^\.+|\.+$/g, '') || 'member';
+
+        let member, email;
+        for (let i = 1; i <= 20 && !member; i++) {
+            email = `${base}${i > 1 ? i : ''}@${emailDomain}`;
+            try {
+                const result = await getPool().query(
+                    `INSERT INTO members
                 (id, account_email, password_hash, full_name, course, year, teams, linkedin, avatar_data_url)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
              RETURNING id, account_email, full_name, course, year, teams, created_at`,
-            [memberId, email, passwordHash, fullName.trim(), course.trim(), year, JSON.stringify([...new Set(teams)]), linkedin?.trim() || null, avatarDataUrl]
-        );
-        const member = result.rows[0];
+                    [memberId, email, passwordHash, fullName.trim(), course.trim(), year, JSON.stringify([...new Set(teams)]), linkedin?.trim() || null, avatarDataUrl]
+                );
+                member = result.rows[0];
+            } catch (error) {
+                if (error.code !== '23505') throw error; // sirf duplicate pe retry
+            }
+        }
+        if (!member) return response.status(409).json({ error: 'Could not create a unique account email. Please try again.' });
 
         return response.status(201).json({
             member: {
