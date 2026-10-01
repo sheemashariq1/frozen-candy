@@ -1,0 +1,2220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Coding Council JMI — Unlock Your Council ID</title>
+
+    <!-- Google Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- QR Code & html2canvas CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+       DESIGN SYSTEM & CSS VARIABLES
+       ========================================================================== */
+        :root {
+            --bg-base: #060913;
+            --bg-surface: #0c1424;
+            --bg-surface-elevated: #131f38;
+            --bg-glass: rgba(14, 23, 42, 0.75);
+
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 240, 255, 0.35);
+
+            --accent-cyan: #00f0ff;
+            --accent-blue: #3b82f6;
+            --accent-indigo: #6366f1;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --font-heading: 'Space Grotesk', -apple-system, sans-serif;
+            --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --card-w: 360px;
+            --card-h: 640px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            color-scheme: dark;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            line-height: 1.5;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Tech Grid & Glow Background */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 32px 32px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .glow-sphere {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.22;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .glow-1 {
+            width: 520px;
+            height: 520px;
+            background: var(--accent-cyan);
+            top: -120px;
+            left: -120px;
+        }
+
+        .glow-2 {
+            width: 600px;
+            height: 600px;
+            background: var(--accent-blue);
+            bottom: 5%;
+            right: -150px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.25rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Top Navbar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--border-subtle);
+            position: relative;
+            z-index: 10;
+        }
+
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .brand-logo-box {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(0, 240, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        .brand-logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .brand-logo-box svg {
+            width: 22px;
+            height: 22px;
+            fill: #030712;
+        }
+
+        .brand-text h1 {
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+        }
+
+        .brand-text span {
+            font-size: 0.72rem;
+            color: var(--accent-cyan);
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        .session-badge {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            color: var(--accent-cyan);
+        }
+
+        /* Buttons & Core Controls */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+            font-family: var(--font-heading);
+            font-size: 0.98rem;
+            font-weight: 600;
+            padding: 0.9rem 1.8rem;
+            border-radius: 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+            user-select: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-glow {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #030712;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.35);
+        }
+
+        .btn-glow:hover {
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-glow:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn-secondary:hover {
+            color: #fff;
+            border-color: var(--accent-cyan);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* SPA Screen Architecture */
+        .app-screen {
+            display: none;
+        }
+
+        .app-screen.active {
+            display: block;
+            animation: screenFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes screenFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Screen 1: Landing Hero */
+        .landing-section {
+            padding: 5rem 0 4rem;
+            text-align: center;
+        }
+
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            padding: 0.45rem 1.1rem;
+            border-radius: 9999px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            color: var(--accent-cyan);
+            margin-bottom: 1.6rem;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2.4rem, 6vw, 4.2rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.1rem;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #ffffff 40%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-subheading {
+            color: #e2e8f0;
+            font-size: clamp(1.1rem, 2.8vw, 1.35rem);
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+
+        .hero-desc {
+            color: var(--text-secondary);
+            font-size: 0.98rem;
+            max-width: 620px;
+            margin: 0 auto 2.5rem;
+            font-weight: 400;
+        }
+
+        .orientation-tag {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 1.5rem;
+            letter-spacing: 0.08em;
+        }
+
+        /* Screen 2: Name Entry Screen */
+        .name-section {
+            padding: 4.5rem 0;
+        }
+
+        .name-card {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            backdrop-filter: blur(16px);
+        }
+
+        .name-card .icon-head {
+            font-size: 2.5rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1.25rem;
+        }
+
+        .name-card h2 {
+            font-family: var(--font-heading);
+            font-size: 1.45rem;
+            margin-bottom: 0.45rem;
+        }
+
+        .name-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .input-field {
+            width: 100%;
+            background: rgba(6, 9, 19, 0.8);
+            border: 1px solid var(--border-subtle);
+            color: #fff;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-family: var(--font-body);
+            outline: none;
+            transition: all 0.2s ease;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-field:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.2);
+        }
+
+        /* Screen 3: Passport Dashboard */
+        .passport-section {
+            padding: 3rem 0 5rem;
+        }
+
+        .passport-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .user-greeting-pill {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--accent-cyan);
+            letter-spacing: 0.08em;
+            margin-bottom: 0.4rem;
+        }
+
+        .passport-title {
+            font-family: var(--font-heading);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+        }
+
+        .progress-box {
+            max-width: 580px;
+            margin: 0 auto;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.65rem;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 999px;
+            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 12px var(--accent-cyan);
+        }
+
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.25rem;
+            max-width: 1060px;
+            margin: 2.5rem auto 0;
+        }
+
+        .activity-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-card.completed {
+            border-color: rgba(16, 185, 129, 0.45);
+            background: rgba(16, 185, 129, 0.04);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
+        }
+
+        .act-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .act-tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            letter-spacing: 0.08em;
+        }
+
+        .act-badge {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.25s ease;
+        }
+
+        .badge-locked {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .badge-completed {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .act-title {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            margin-bottom: 0.45rem;
+            color: #fff;
+        }
+
+        .act-desc {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin-bottom: 1.4rem;
+            line-height: 1.45;
+        }
+
+        .btn-act-unlock {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 0.88rem;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid var(--border-glow);
+            background: rgba(0, 240, 255, 0.08);
+            color: var(--accent-cyan);
+            transition: all 0.2s;
+        }
+
+        .btn-act-unlock:hover {
+            background: var(--accent-cyan);
+            color: #030712;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        .activity-card.completed .btn-act-unlock {
+            background: transparent;
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--accent-emerald);
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .final-unlock-card {
+            display: none;
+            max-width: 600px;
+            margin: 3rem auto 0;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.12), rgba(59, 130, 246, 0.12));
+            border: 1px solid var(--accent-cyan);
+            border-radius: 22px;
+            padding: 2.2rem 2rem;
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.2);
+        }
+
+        .final-unlock-card.show {
+            display: block;
+            animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.94);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .final-unlock-card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.6rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .final-unlock-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .reset-bar {
+            text-align: center;
+            margin-top: 3.5rem;
+        }
+
+        .btn-reset {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .btn-reset:hover {
+            color: var(--accent-rose);
+        }
+
+        /* Screen 4: ID Generator */
+        .generator-section {
+            padding: 2.5rem 0 5rem;
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3.5rem;
+            align-items: start;
+        }
+
+        @media (min-width: 1024px) {
+            .workspace-grid {
+                grid-template-columns: 1.15fr 0.85fr;
+            }
+        }
+
+        .form-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 2.2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-panel h2 {
+            font-family: var(--font-heading);
+            font-size: 1.6rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .form-panel .panel-sub {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .form-field {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 580px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        input[type="text"],
+        input[type="url"],
+        select {
+            width: 100%;
+            background: rgba(6, 9, 19, 0.7);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            color: #fff;
+            padding: 0.85rem 1rem;
+            font-size: 0.92rem;
+            font-family: var(--font-body);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
+        }
+
+        .file-upload-box {
+            position: relative;
+            border: 2px dashed rgba(255, 255, 255, 0.16);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(6, 9, 19, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        .file-upload-box:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.04);
+        }
+
+        .file-upload-box input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-upload-box i {
+            font-size: 1.8rem;
+            color: var(--accent-cyan);
+            margin-bottom: 0.4rem;
+        }
+
+        .teams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .team-chip {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .team-chip input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .team-chip span {
+            display: block;
+            padding: 0.55rem 0.6rem;
+            background: rgba(6, 9, 19, 0.6);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            text-align: center;
+            color: var(--text-secondary);
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .team-chip input:checked+span {
+            background: rgba(0, 240, 255, 0.12);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* Right Preview Sticky Column */
+        .preview-panel {
+            display: flex;
+            justify-content: center;
+        }
+
+        .preview-sticky {
+            position: sticky;
+            top: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .preview-heading {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan);
+            animation: pulseDot 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseDot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(0.85);
+            }
+        }
+
+        /* The Physical 9:16 ID Card */
+        .id-card-viewport {
+            width: var(--card-w);
+            height: var(--card-h);
+            border-radius: 20px;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 240, 255, 0.15);
+            background: #080d19;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .id-card {
+            width: 100%;
+            height: 100%;
+            background: #080d19;
+            border: 1px solid rgba(0, 240, 255, 0.28);
+            border-radius: 20px;
+            padding: 1.6rem 1.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            color: #fff;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .card-mesh {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(to right, rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
+            background-size: 24px 24px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .card-glow {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .card-glow.top-right {
+            top: -80px;
+            right: -80px;
+            background: rgba(0, 240, 255, 0.22);
+        }
+
+        .card-glow.bottom-left {
+            bottom: -60px;
+            left: -60px;
+            background: rgba(59, 130, 246, 0.18);
+        }
+
+        .card-top {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.85rem;
+        }
+
+        .card-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .card-logo-wrap {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .card-logo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-logo-wrap svg {
+            width: 20px;
+            height: 20px;
+            fill: #030712;
+        }
+
+        .card-brand-text h3 {
+            font-family: var(--font-heading);
+            font-size: 0.92rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: 0.05em;
+        }
+
+        .card-brand-text p {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .card-chip {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            padding: 0.22rem 0.55rem;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            letter-spacing: 0.08em;
+        }
+
+        .card-center {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+
+        .avatar-wrap {
+            position: relative;
+            margin-bottom: 0.85rem;
+        }
+
+        .avatar-ring {
+            width: 124px;
+            height: 124px;
+            border-radius: 24px;
+            padding: 4px;
+            background: linear-gradient(135deg, var(--accent-cyan), rgba(59, 130, 246, 0.4), rgba(255, 255, 255, 0.1));
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-ring img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            background: #0f172a;
+        }
+
+        .session-tag {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #050b14;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            font-weight: 600;
+            padding: 0.15rem 0.65rem;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .card-name {
+            font-family: var(--font-heading);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .card-academic {
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-teams {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.4rem;
+            max-height: 52px;
+            overflow: hidden;
+        }
+
+        .team-badge-pill {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            padding: 0.22rem 0.6rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #e2e8f0;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        /* Card Footer */
+        .card-footer {
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-footer-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.9rem;
+            background: rgba(12, 18, 32, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.75rem 0.85rem;
+            border-radius: 12px;
+        }
+
+        .card-qr-box {
+            width: 72px;
+            height: 72px;
+            background: #fff;
+            padding: 4px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .card-qr-box canvas,
+        .card-qr-box img {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+
+        .card-seal-box {
+            width: 72px;
+            height: 72px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px dashed var(--accent-cyan);
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .card-seal-box i {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            margin-bottom: 0.2rem;
+        }
+
+        .card-seal-box span {
+            font-family: var(--font-mono);
+            font-size: 0.48rem;
+            color: var(--accent-cyan);
+            letter-spacing: 0.05em;
+        }
+
+        .card-connect-meta {
+            flex-grow: 1;
+            text-align: left;
+            overflow: hidden;
+        }
+
+        .connect-label {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            letter-spacing: 0.12em;
+            color: var(--accent-cyan);
+            margin-bottom: 0.35rem;
+        }
+
+        .connect-value {
+            font-size: 0.72rem;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .card-subfoot {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.6rem;
+            font-family: var(--font-mono);
+            font-size: 0.5rem;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+        }
+
+        .download-action-box {
+            width: var(--card-w);
+            margin-top: 1.25rem;
+        }
+
+        .btn-download {
+            width: 100%;
+            background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 100%);
+            color: #040915;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.05rem;
+            padding: 1rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(0, 240, 255, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 240, 255, 0.45);
+        }
+
+        .download-caption {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .account-credentials {
+            display: none;
+            margin: 1rem 0;
+            padding: 1rem;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 10px;
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .account-credentials.visible {
+            display: block;
+        }
+
+        .account-credentials h3 {
+            font-family: var(--font-heading);
+            font-size: 0.95rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .account-credentials p,
+        .account-credentials code {
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            overflow-wrap: anywhere;
+        }
+
+        .credential-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding-top: 0.65rem;
+        }
+
+        .credential-row strong {
+            color: var(--text-main);
+            font-size: 0.8rem;
+        }
+
+        .credential-row code {
+            color: var(--accent-cyan);
+            text-align: right;
+        }
+
+        .credential-warning {
+            margin-top: 0.75rem;
+            color: #fbbf24 !important;
+        }
+
+        .creation-status {
+            min-height: 1.3rem;
+            margin-top: 0.6rem;
+            color: var(--accent-rose);
+            font-size: 0.8rem;
+        }
+
+        .btn:disabled,
+        .btn-download:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+            transform: none;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 7, 18, 0.85);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            z-index: 10000;
+        }
+
+        .modal-overlay.active {
+            display: flex !important;
+        }
+
+        .modal-card {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 2.2rem 1.8rem;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+            animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes modalPop {
+            from {
+                transform: scale(0.92);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-icon {
+            font-size: 2.2rem;
+            color: var(--accent-cyan);
+            margin-bottom: 0.6rem;
+        }
+
+        .modal-card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.35rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .modal-card p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .modal-input {
+            width: 100%;
+            background: rgba(6, 9, 19, 0.8);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            color: #fff;
+            padding: 0.85rem;
+            font-size: 1.15rem;
+            font-family: var(--font-mono);
+            text-align: center;
+            text-transform: uppercase;
+            outline: none;
+            margin-bottom: 1.25rem;
+        }
+
+        .modal-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.2);
+        }
+
+        .modal-error {
+            color: var(--accent-rose);
+            font-size: 0.8rem;
+            margin-top: -0.75rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+        }
+
+        /* Small Screen Adjustments */
+        @media (max-width: 420px) {
+            :root {
+                --card-w: 320px;
+                --card-h: 568px;
+            }
+
+            .avatar-ring {
+                width: 105px;
+                height: 105px;
+            }
+
+            .card-qr-box,
+            .card-seal-box {
+                width: 64px;
+                height: 64px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Ambient Light Fields -->
+    <div class="bg-grid"></div>
+    <div class="glow-sphere glow-1"></div>
+    <div class="glow-sphere glow-2"></div>
+
+    <!-- Top Navigation Header -->
+    <header class="top-bar">
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+            <a href="#" class="brand-wrap">
+                <div class="brand-logo-box">
+                    <img src="cc_logo.jpeg" alt="Logo" onerror="showLogoSvg(this)">
+                </div>
+                <div class="brand-text">
+                    <h1>CODING COUNCIL</h1>
+                    <span>JAMIA MILLIA ISLAMIA</span>
+                </div>
+            </a>
+            <div class="session-badge">ORIENTATION 2026–27</div>
+        </div>
+    </header>
+
+    <!-- SCREEN 1: LANDING HERO -->
+    <section class="app-screen active" id="screen-landing">
+        <div class="container landing-section">
+            <div class="hero-pill">
+                <i class="fa-solid fa-id-badge"></i> CODING COUNCIL ID ACCESS
+            </div>
+            <h1 class="hero-title">
+                UNLOCK YOUR<br /><span>COUNCIL ID</span>
+            </h1>
+            <p class="hero-subheading">Meet. Connect. Participate. Become a part of the Council.</p>
+            <p class="hero-desc">
+                Complete today's orientation activities with your peers and unlock your personalized Coding Council
+                Digital Member ID.
+            </p>
+            <button type="button" class="btn btn-glow" onclick="startJourney()">
+                GET STARTED <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <div class="orientation-tag">Orientation 2026–27 • Jamia Millia Islamia</div>
+        </div>
+    </section>
+
+    <!-- SCREEN 2: ENTER NAME -->
+    <section class="app-screen" id="screen-name">
+        <div class="container name-section">
+            <div class="name-card">
+                <div class="icon-head">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+                <h2>WELCOME TO CODING COUNCIL JMI</h2>
+                <p>Enter your full name to get started. Complete the activities and unlock your Digital ID.</p>
+
+                <input type="text" id="user-name-input" class="input-field" placeholder="e.g. Ayesha Khan"
+                    maxlength="40" autocomplete="name" />
+                <button type="button" class="btn btn-glow" onclick="submitName()" style="width:100%;">
+                    CONTINUE <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCREEN 3: PASSPORT DASHBOARD -->
+    <section class="app-screen" id="screen-passport">
+        <div class="container passport-section">
+            <div class="passport-header">
+                <div class="user-greeting-pill" id="passport-user-name">WELCOME, MEMBER</div>
+                <h2 class="passport-title">YOUR COUNCIL JOURNEY</h2>
+
+                <div class="progress-box">
+                    <div class="progress-labels">
+                        <span>ORIENTATION PROGRESS</span>
+                        <span id="progress-status-text">0 / 5 ACTIVITIES COMPLETED</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progress-fill-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activities-grid">
+                <!-- Activity 1 -->
+                <div class="activity-card" id="act-card-1">
+                    <div>
+                        <div class="act-header">
+                            <span class="act-tag">ACTIVITY 01</span>
+                            <span class="act-badge badge-locked" id="act-badge-1"><i class="fa-solid fa-lock"></i>
+                                LOCKED</span>
+                        </div>
+                        <h3 class="act-title">INTRODUCE YOURSELF</h3>
+                        <p class="act-desc">Tell us your name, team and one interesting thing about yourself.</p>
+                    </div>
+                    <button type="button" class="btn-act-unlock"
+                        onclick="openCodeModal('introduce', 'INTRODUCE YOURSELF')">
+                        ENTER ACTIVITY CODE
+                    </button>
+                </div>
+
+                <!-- Activity 2 -->
+                <div class="activity-card" id="act-card-2">
+                    <div>
+                        <div class="act-header">
+                            <span class="act-tag">ACTIVITY 02</span>
+                            <span class="act-badge badge-locked" id="act-badge-2"><i class="fa-solid fa-lock"></i>
+                                LOCKED</span>
+                        </div>
+                        <h3 class="act-title">PASS THE BOTTLE</h3>
+                        <p class="act-desc">Whoever gets the bottle answers a fun question or completes a task.</p>
+                    </div>
+                    <button type="button" class="btn-act-unlock" onclick="openCodeModal('bottle', 'PASS THE BOTTLE')">
+                        ENTER ACTIVITY CODE
+                    </button>
+                </div>
+
+                <!-- Activity 3 -->
+                <div class="activity-card" id="act-card-3">
+                    <div>
+                        <div class="act-header">
+                            <span class="act-tag">ACTIVITY 03</span>
+                            <span class="act-badge badge-locked" id="act-badge-3"><i class="fa-solid fa-lock"></i>
+                                LOCKED</span>
+                        </div>
+                        <h3 class="act-title">RANDOM CHITS</h3>
+                        <p class="act-desc">Pick a random chit and complete the challenge written on it.</p>
+                    </div>
+                    <button type="button" class="btn-act-unlock" onclick="openCodeModal('chits', 'RANDOM CHITS')">
+                        ENTER ACTIVITY CODE
+                    </button>
+                </div>
+
+                <!-- Activity 4 -->
+                <div class="activity-card" id="act-card-4">
+                    <div>
+                        <div class="act-header">
+                            <span class="act-tag">ACTIVITY 04</span>
+                            <span class="act-badge badge-locked" id="act-badge-4"><i class="fa-solid fa-lock"></i>
+                                LOCKED</span>
+                        </div>
+                        <h3 class="act-title">HUMAN BINGO</h3>
+                        <p class="act-desc">Find people who match the statements and complete your bingo.</p>
+                    </div>
+                    <button type="button" class="btn-act-unlock" onclick="openCodeModal('bingo', 'HUMAN BINGO')">
+                        ENTER ACTIVITY CODE
+                    </button>
+                </div>
+
+                <!-- Activity 5 -->
+                <div class="activity-card" id="act-card-5">
+                    <div>
+                        <div class="act-header">
+                            <span class="act-tag">ACTIVITY 05</span>
+                            <span class="act-badge badge-locked" id="act-badge-5"><i class="fa-solid fa-lock"></i>
+                                LOCKED</span>
+                        </div>
+                        <h3 class="act-title">COMMON GROUND</h3>
+                        <p class="act-desc">Groups of 4–5 have 3 minutes to find 5 things everyone has in common.</p>
+                    </div>
+                    <button type="button" class="btn-act-unlock"
+                        onclick="openCodeModal('commonGround', 'COMMON GROUND')">
+                        ENTER ACTIVITY CODE
+                    </button>
+                </div>
+            </div>
+
+            <div class="final-unlock-card" id="final-unlock-card">
+                <div style="font-size:2.8rem; margin-bottom:0.4rem;">🎉</div>
+                <h3>COUNCIL ID UNLOCKED</h3>
+                <p>You’ve completed your orientation journey. Welcome to Coding Council JMI.</p>
+                <button type="button" class="btn btn-glow" onclick="goToGenerator()">
+                    GENERATE MY DIGITAL ID <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <div class="reset-bar">
+                <button type="button" class="btn-reset" onclick="confirmResetJourney()">Reset My Journey (Start
+                    Over)</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCREEN 4: ID GENERATOR -->
+    <section class="app-screen" id="screen-generator">
+        <div class="container generator-section">
+            <div class="workspace-grid">
+
+                <!-- LEFT FORM PANEL -->
+                <section class="form-panel">
+                    <h2>Council ID Customization</h2>
+                    <p class="panel-sub">Orientation journey verified! Complete your details below. Preview updates
+                        live.</p>
+
+                    <form id="id-custom-form" onsubmit="event.preventDefault();">
+                        <div class="form-field">
+                            <label>Full Name *</label>
+                            <input type="text" id="member-name-input" placeholder="e.g. Ayesha Khan" required />
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label>Course / Branch *</label>
+                                <input type="text" id="member-course-input" placeholder="e.g. B.Tech CSE" required />
+                            </div>
+                            <div class="form-field">
+                                <label>Year *</label>
+                                <select id="member-year-select" required>
+                                    <option value="1st Year" selected>1st Year</option>
+                                    <option value="2nd Year">2nd Year</option>
+                                    <option value="3rd Year">3rd Year</option>
+                                    <option value="4th Year">4th Year</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Profile Photo *</label>
+                            <div class="file-upload-box" id="photo-dropzone">
+                                <input type="file" id="member-photo-input" accept="image/png, image/jpeg, image/webp" />
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <p style="font-size:0.88rem; font-weight:600;">Click to upload or drag image here</p>
+                                <small style="color:var(--text-muted);">Auto-cropped and optimized square photo</small>
+                            </div>
+                        </div>
+
+                        <!-- 9 Official Teams from your setup -->
+                        <div class="form-field">
+                            <label>Team(s) * (Select one or multiple)</label>
+                            <div class="teams-grid">
+                                <label class="team-chip"><input type="checkbox" name="team" value="Operations"
+                                        checked><span>Operations</span></label>
+                                <label class="team-chip"><input type="checkbox" name="team"
+                                        value="AI/ML"><span>AI/ML</span></label>
+                                <label class="team-chip"><input type="checkbox" name="team"
+                                        value="Web Development"><span>Web Dev</span></label>
+                                <label class="team-chip"><input type="checkbox" name="team"
+                                        value="Graphics"><span>Graphics</span></label>
+                                <label class="team-chip"><input type="checkbox" name="team"
+                                        value="DSA"><span>DSA</span></label>
+                                <label class="team-chip"><input type="checkbox" name="team"
+                                        value="Human Resources"><span>Human Resources</span></label>
+                                <label class="team-chip"><input type="checkbox" name="team"
+                                        value="Social Media Marketing"><span>Social Media Marketing</span></label>
+
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label>LinkedIn Profile URL or Handle <span
+                                    style="font-weight:400; color:var(--text-muted);">(Optional)</span></label>
+                            <input type="text" id="member-linkedin-input"
+                                placeholder="e.g. linkedin.com/in/username or username" />
+                            <small style="color:var(--text-muted); font-size:0.75rem;">If omitted, an official Council
+                                Verification Seal is applied.</small>
+                        </div>
+                        <button type="button" class="btn btn-glow" id="create-member-trigger"
+                            onclick="createMemberAccount()" style="width:100%;">
+                            CREATE MY ID & ACCOUNT <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <p class="creation-status" id="creation-status" role="status" aria-live="polite"></p>
+                    </form>
+                </section>
+
+                <!-- RIGHT PREVIEW PANEL -->
+                <section class="preview-panel">
+                    <div class="preview-sticky">
+                        <div class="preview-heading">
+                            <span class="live-dot"></span> ID CARD
+                        </div>
+
+                        <div class="id-card-viewport">
+                            <div id="id-card-canvas" class="id-card">
+                                <div class="card-mesh"></div>
+                                <div class="card-glow top-right"></div>
+                                <div class="card-glow bottom-left"></div>
+
+                                <div class="card-top">
+                                    <div class="card-brand">
+                                        <div class="card-logo-wrap">
+                                            <img src="cc_logo.jpeg" alt="Logo" onerror="showLogoSvg(this)">
+                                        </div>
+                                        <div class="card-brand-text">
+                                            <h3>CODING COUNCIL</h3>
+                                            <p>JAMIA MILLIA ISLAMIA</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-chip">DIGITAL MEMBER ID</div>
+                                </div>
+
+                                <div class="card-center">
+                                    <div class="avatar-wrap">
+                                        <div class="avatar-ring">
+                                            <img id="card-avatar-img"
+                                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23131f38'/%3E%3Cpath d='M50 48a16 16 0 100-32 16 16 0 000 32zm0 8c-18.7 0-34 13.3-34 30v4h68v-4c0-16.7-15.3-30-34-30z' fill='%23385170'/%3E%3C/svg%3E"
+                                                alt="Avatar" crossorigin="anonymous" />
+                                        </div>
+                                        <div class="session-tag">SESSION 2026–27</div>
+                                    </div>
+
+                                    <div class="card-name" id="card-display-name">YOUR NAME</div>
+                                    <div class="card-academic" id="card-display-academic">B.Tech CSE · 1st Year</div>
+
+                                    <div class="card-teams" id="card-display-teams">
+                                        <span class="team-badge-pill">OPERATIONS</span>
+                                    </div>
+                                </div>
+
+                                <div class="card-footer">
+                                    <div class="card-footer-box">
+                                        <div class="card-qr-box" id="card-qr-container"></div>
+                                        <div class="card-seal-box" id="card-seal-container">
+                                            <i class="fa-solid fa-shield-check"></i>
+                                            <span>COUNCIL<br>VERIFIED</span>
+                                        </div>
+
+                                        <div class="card-connect-meta">
+                                            <div class="connect-label" id="card-connect-label">MEMBER STATUS</div>
+                                            <div class="connect-value" id="card-connect-value">
+                                                <i class="fa-solid fa-circle-check"
+                                                    style="color:var(--accent-cyan);"></i>
+                                                <span>Official Member</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-subfoot">
+                                        <span>OFFICIAL MEMBER CREDENTIAL</span>
+                                        <span>NEW DELHI, INDIA</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Download Action -->
+                        <div class="download-action-box">
+                            <div class="account-credentials" id="account-credentials" aria-live="polite">
+                                <h3><i class="fa-solid fa-circle-check"></i> ID created</h3>
+                                <p>Your generated credentials are shown once. Save them somewhere secure.</p>
+                                <div class="credential-row"><strong>Email</strong><code
+                                        id="created-account-email"></code></div>
+                                <div class="credential-row"><strong>Password</strong><code
+                                        id="created-account-password"></code></div>
+                                <p class="credential-warning">This is an account address, not a mailbox. The password
+                                    cannot be recovered.</p>
+                            </div>
+                            <button type="button" class="btn-download" id="btn-download-trigger"
+                                onclick="downloadIDCardPNG()" disabled>
+                                <i class="fa-solid fa-cloud-arrow-down"></i> DOWNLOAD MY DIGITAL ID
+                            </button>
+                            <p class="download-caption">Generates 1440 × 2560 px high-res PNG for mobile storage</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL: CODE ENTRY -->
+    <div class="modal-overlay" id="unlock-modal">
+        <div class="modal-card">
+            <div class="modal-icon">
+                <i class="fa-solid fa-key"></i>
+            </div>
+            <h3 id="modal-activity-title">ACTIVITY CODE</h3>
+            <p>Enter the secret code announced by the organizer after completing this activity.</p>
+
+            <input type="text" id="modal-code-input" class="modal-input" placeholder="ENTER CODE" maxlength="15"
+                autocomplete="off" />
+            <div class="modal-error" id="modal-error-msg">Invalid code. Please check with your organizer!</div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeCodeModal()">Cancel</button>
+                <button type="button" class="btn btn-glow" onclick="verifyActivityCode()">UNLOCK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const ACTIVITY_CODES = {
+            introduce: "INTRO26",
+            bottle: "BOTTLE26",
+            chits: "CHITS26",
+            bingo: "BINGO26",
+            commonGround: "GROUND26"
+        };
+
+        let currentUnlockKey = null;
+        let userPassport = {
+            name: "",
+            completedActivities: {
+                introduce: false,
+                bottle: false,
+                chits: false,
+                bingo: false,
+                commonGround: false
+            },
+            avatarDataUrl: null
+        };
+        let createdMemberId = null;
+
+        async function createMemberAccount() {
+            const trigger = document.getElementById('create-member-trigger');
+            const status = document.getElementById('creation-status');
+            const name = document.getElementById('member-name-input').value.trim();
+            const course = document.getElementById('member-course-input').value.trim();
+            const teams = Array.from(document.querySelectorAll('input[name="team"]:checked'), input => input.value);
+            const photo = userPassport.avatarDataUrl;
+
+            status.textContent = '';
+            if (!name || !course || !teams.length || !photo) {
+                status.textContent = 'Complete your name, course, at least one team, and profile photo first.';
+                return;
+            }
+
+            trigger.disabled = true;
+            trigger.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> CREATING ACCOUNT...';
+
+            try {
+                const response = await fetch('/api/members', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fullName: name,
+                        course,
+                        year: document.getElementById('member-year-select').value,
+                        teams,
+                        linkedin: document.getElementById('member-linkedin-input').value.trim(),
+                        avatarDataUrl: photo
+                    })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Could not create your account.');
+
+                createdMemberId = result.member.id;
+                document.getElementById('created-account-email').textContent = result.credentials.email;
+                document.getElementById('created-account-password').textContent = result.credentials.password;
+                document.getElementById('account-credentials').classList.add('visible');
+                document.getElementById('btn-download-trigger').disabled = false;
+                document.querySelectorAll('#id-custom-form input, #id-custom-form select').forEach(input => {
+                    input.disabled = true;
+                });
+                trigger.innerHTML = '<i class="fa-solid fa-circle-check"></i> ID & ACCOUNT CREATED';
+                status.style.color = 'var(--accent-emerald)';
+                status.textContent = 'Your member profile has been saved.';
+            } catch (error) {
+                status.style.color = 'var(--accent-rose)';
+                status.textContent = error.message || 'Could not reach the server. Please try again.';
+                trigger.disabled = false;
+                trigger.innerHTML = 'CREATE MY ID & ACCOUNT <i class="fa-solid fa-arrow-right"></i>';
+            }
+        }
+
+        function showLogoSvg(imgEl) {
+            const wrap = imgEl.parentElement;
+            if (wrap) {
+                wrap.innerHTML = `
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+                    </svg>
+                `;
+            }
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.app-screen').forEach(screen => {
+                screen.classList.remove('active');
+                screen.style.display = 'none';
+            });
+
+            const activeScreen = document.getElementById(screenId);
+            if (activeScreen) {
+                activeScreen.classList.add('active');
+                activeScreen.style.display = 'block';
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function startJourney() {
+            showScreen('screen-name');
+            setTimeout(() => {
+                const inp = document.getElementById('user-name-input');
+                if (inp) inp.focus();
+            }, 150);
+        }
+
+        function submitName() {
+            const inputEl = document.getElementById('user-name-input');
+            const name = inputEl.value.trim();
+            if (!name) {
+                alert('Please enter your full name to proceed.');
+                inputEl.focus();
+                return;
+            }
+
+            userPassport.name = name;
+            saveState();
+            renderPassport();
+            showScreen('screen-passport');
+        }
+
+        function saveState() {
+            // Persistent storage disabled: Session runs purely in-memory
+        }
+
+        function loadSavedState() {
+            // Purana koi bhi saved data ho toh use delete kar dega
+            try {
+                localStorage.removeItem('cc_jmi_orientation_state');
+                sessionStorage.clear();
+            } catch (e) { }
+
+            // Hamesha landing page se fresh start karega
+            showScreen('screen-landing');
+        }
+
+        function getCompletedCount() {
+            if (!userPassport.completedActivities) return 0;
+            return Object.values(userPassport.completedActivities).filter(Boolean).length;
+        }
+
+        function renderPassport() {
+            const userGreeting = document.getElementById('passport-user-name');
+            const progressText = document.getElementById('progress-status-text');
+            const progressFill = document.getElementById('progress-fill-bar');
+            const unlockCard = document.getElementById('final-unlock-card');
+
+            if (userGreeting) userGreeting.textContent = `WELCOME, ${userPassport.name.toUpperCase()}`;
+
+            const count = getCompletedCount();
+            if (progressText) progressText.textContent = `${count} / 5 ACTIVITIES COMPLETED`;
+            if (progressFill) progressFill.style.width = `${(count / 5) * 100}%`;
+
+            const mapping = [
+                { key: 'introduce', num: 1 },
+                { key: 'bottle', num: 2 },
+                { key: 'chits', num: 3 },
+                { key: 'bingo', num: 4 },
+                { key: 'commonGround', num: 5 }
+            ];
+
+            mapping.forEach(item => {
+                const cardEl = document.getElementById(`act-card-${item.num}`);
+                const badgeEl = document.getElementById(`act-badge-${item.num}`);
+                const isDone = userPassport.completedActivities[item.key];
+
+                if (cardEl && badgeEl) {
+                    if (isDone) {
+                        cardEl.classList.add('completed');
+                        badgeEl.className = 'act-badge badge-completed';
+                        badgeEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> COMPLETED`;
+                    } else {
+                        cardEl.classList.remove('completed');
+                        badgeEl.className = 'act-badge badge-locked';
+                        badgeEl.innerHTML = `<i class="fa-solid fa-lock"></i> LOCKED`;
+                    }
+                }
+            });
+
+            if (unlockCard) {
+                if (count === 5) {
+                    unlockCard.classList.add('show');
+                } else {
+                    unlockCard.classList.remove('show');
+                }
+            }
+        }
+
+        function openCodeModal(key, title) {
+            currentUnlockKey = key;
+            const modal = document.getElementById('unlock-modal');
+            const modalTitle = document.getElementById('modal-activity-title');
+            const modalInput = document.getElementById('modal-code-input');
+            const modalErr = document.getElementById('modal-error-msg');
+
+            if (modalTitle) modalTitle.textContent = title;
+            if (modalInput) modalInput.value = '';
+            if (modalErr) modalErr.style.display = 'none';
+            if (modal) modal.classList.add('active');
+
+            if (modalInput) setTimeout(() => modalInput.focus(), 150);
+        }
+
+        function closeCodeModal() {
+            const modal = document.getElementById('unlock-modal');
+            const modalInput = document.getElementById('modal-code-input');
+            if (modal) modal.classList.remove('active');
+            if (modalInput) modalInput.value = '';
+            currentUnlockKey = null;
+        }
+
+        function verifyActivityCode() {
+            const modalInput = document.getElementById('modal-code-input');
+            const modalErr = document.getElementById('modal-error-msg');
+            const entered = modalInput.value.trim().toUpperCase();
+            const expected = (ACTIVITY_CODES[currentUnlockKey] || '').toUpperCase();
+
+            if (entered && entered === expected) {
+                userPassport.completedActivities[currentUnlockKey] = true;
+                saveState();
+                closeCodeModal();
+                renderPassport();
+
+                if (getCompletedCount() === 5) {
+                    const banner = document.getElementById('final-unlock-card');
+                    if (banner) banner.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else {
+                if (modalErr) modalErr.style.display = 'block';
+                if (modalInput) modalInput.focus();
+            }
+        }
+
+        function goToGenerator() {
+            initGenerator();
+            showScreen('screen-generator');
+        }
+
+        function confirmResetJourney() {
+            if (confirm('Do you want to reset your orientation progress and start from scratch?')) {
+                localStorage.removeItem('cc_jmi_orientation_state');
+                userPassport = {
+                    name: "",
+                    completedActivities: { introduce: false, bottle: false, chits: false, bingo: false, commonGround: false },
+                    avatarDataUrl: null
+                };
+                const inp = document.getElementById('user-name-input');
+                if (inp) inp.value = '';
+                showScreen('screen-landing');
+            }
+        }
+
+        function initGenerator() {
+            const nameInput = document.getElementById('member-name-input');
+            const courseInput = document.getElementById('member-course-input');
+            const yearSelect = document.getElementById('member-year-select');
+            const cardAvatar = document.getElementById('card-avatar-img');
+
+            if (nameInput) nameInput.value = userPassport.name || "Ayesha Khan";
+            if (courseInput && !courseInput.value) courseInput.value = "B.Tech CSE";
+            if (yearSelect && !yearSelect.value) yearSelect.value = "1st Year";
+            if (cardAvatar && userPassport.avatarDataUrl) {
+                cardAvatar.src = userPassport.avatarDataUrl;
+            }
+            updateLiveCard();
+        }
+
+        function sanitizeLinkedInUrl(val) {
+            let s = val.trim();
+            if (!s) return null;
+            if (s.startsWith('http://') || s.startsWith('https://')) return s;
+            s = s.replace(/^linkedin\.com\/in\//i, '').replace(/^in\//i, '').replace(/\/$/, '');
+            return `https://linkedin.com/in/${s}`;
+        }
+
+        function updateLiveCard() {
+            const nameInput = document.getElementById('member-name-input');
+            const courseInput = document.getElementById('member-course-input');
+            const yearSelect = document.getElementById('member-year-select');
+            const linkedinInput = document.getElementById('member-linkedin-input');
+            const teamCheckboxes = document.querySelectorAll('input[name="team"]');
+
+            const cardName = document.getElementById('card-display-name');
+            const cardAcademic = document.getElementById('card-display-academic');
+            const cardTeams = document.getElementById('card-display-teams');
+            const cardQrBox = document.getElementById('card-qr-container');
+            const cardSealBox = document.getElementById('card-seal-container');
+            const connectLabel = document.getElementById('card-connect-label');
+            const connectValue = document.getElementById('card-connect-value');
+
+            // 1. Name & Academic
+            if (cardName && nameInput) {
+                cardName.textContent = nameInput.value.trim().toUpperCase() || 'YOUR NAME';
+            }
+            if (cardAcademic && courseInput && yearSelect) {
+                cardAcademic.textContent = `${courseInput.value.trim() || 'Course'} · ${yearSelect.value}`;
+            }
+
+            // 2. Team Badges
+            if (cardTeams) {
+                const selected = Array.from(teamCheckboxes).filter(cb => cb.checked).map(cb => cb.value.toUpperCase());
+                cardTeams.innerHTML = '';
+                if (selected.length > 0) {
+                    selected.forEach(team => {
+                        const pill = document.createElement('span');
+                        pill.className = 'team-badge-pill';
+                        pill.textContent = team;
+                        cardTeams.appendChild(pill);
+                    });
+                } else {
+                    cardTeams.innerHTML = '<span class="team-badge-pill">MEMBER</span>';
+                }
+            }
+
+            // 3. QR Code or Council Seal
+            const fullUrl = linkedinInput ? sanitizeLinkedInUrl(linkedinInput.value) : null;
+            if (fullUrl) {
+                if (cardQrBox) cardQrBox.style.display = 'flex';
+                if (cardSealBox) cardSealBox.style.display = 'none';
+                if (connectLabel) connectLabel.textContent = 'LINKEDIN PROFILE';
+
+                if (connectValue) {
+                    connectValue.innerHTML = `<i class="fa-brands fa-linkedin" style="color:var(--accent-cyan);"></i> <span>SCAN TO CONNECT</span>`;
+                }
+
+                if (cardQrBox) {
+                    cardQrBox.innerHTML = '';
+                    try {
+                        new QRCode(cardQrBox, {
+                            text: fullUrl,
+                            width: 80,
+                            height: 80,
+                            colorDark: '#080d19',
+                            colorLight: '#ffffff',
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+                    } catch (e) {
+                        console.warn("QR Error:", e);
+                    }
+                }
+            } else {
+                if (cardQrBox) cardQrBox.style.display = 'none';
+                if (cardSealBox) cardSealBox.style.display = 'flex';
+                if (connectLabel) connectLabel.textContent = 'MEMBER STATUS';
+                if (connectValue) {
+                    connectValue.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--accent-cyan);"></i> <span>Official Member</span>`;
+                }
+            }
+        }
+
+        // Automatic Photo Resizing (Safeguards LocalStorage Quota)
+        function handlePhoto(file) {
+            if (!file || !file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 400; // Optimal square size
+                    canvas.width = maxDim;
+                    canvas.height = maxDim;
+                    const ctx = canvas.getContext('2d');
+
+                    const minSide = Math.min(img.width, img.height);
+                    const sx = (img.width - minSide) / 2;
+                    const sy = (img.height - minSide) / 2;
+
+                    ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, maxDim, maxDim);
+                    const downscaledDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+                    const cardAvatar = document.getElementById('card-avatar-img');
+                    if (cardAvatar) cardAvatar.src = downscaledDataUrl;
+
+                    userPassport.avatarDataUrl = downscaledDataUrl;
+                    saveState();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 1440 × 2560 px High-Res PNG Download (Offscreen Renderer)
+        /* 1440 × 2560 px High-Res PNG Download with QR Code Fix */
+        async function downloadIDCardPNG() {
+            const nameInput = document.getElementById('member-name-input');
+            const btn = document.getElementById('btn-download-trigger');
+            const cardCanvas = document.getElementById('id-card-canvas');
+
+            if (!nameInput || !nameInput.value.trim()) {
+                alert('Please fill in your Full Name.');
+                nameInput.focus();
+                return;
+            }
+
+            if (!createdMemberId) {
+                alert('Create your ID and account before downloading.');
+                return;
+            }
+
+            const origText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> GENERATING 2560px PNG...`;
+
+            // FIX: Convert QR Code canvas to a permanent <img> so html2canvas captures it 100%
+            const qrBox = document.getElementById('card-qr-container');
+            const qrCanvas = qrBox ? qrBox.querySelector('canvas') : null;
+            let originalQrHtml = '';
+            if (qrCanvas && qrBox.style.display !== 'none') {
+                originalQrHtml = qrBox.innerHTML;
+                const qrImageSrc = qrCanvas.toDataURL('image/png');
+                qrBox.innerHTML = `<img src="${qrImageSrc}" style="width:100%; height:100%; object-fit:contain; display:block;" />`;
+            }
+
+            try {
+                const cardRect = cardCanvas.getBoundingClientRect();
+                const scaleFactor = Math.max(4, Math.round(1440 / cardRect.width));
+
+                const canvas = await html2canvas(cardCanvas, {
+                    scale: scaleFactor,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#080d19',
+                    logging: false
+                });
+
+                const rawName = nameInput.value.trim() || 'Member';
+                const cleanName = rawName.replace(/[^a-zA-Z0-9]/g, '_');
+                const filename = `CodingCouncil_JMI_ID_${cleanName}.png`;
+
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (err) {
+                console.error('Download error:', err);
+                alert('Could not export ID. Please try again.');
+            } finally {
+                // Restore original live QR so the preview keeps working
+                if (originalQrHtml) {
+                    qrBox.innerHTML = originalQrHtml;
+                }
+                btn.disabled = false;
+                btn.innerHTML = origText;
+            }
+        }
+
+        // DOM Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            const nameInput = document.getElementById('user-name-input');
+            if (nameInput) {
+                nameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') submitName();
+                });
+            }
+
+            const modalInput = document.getElementById('modal-code-input');
+            if (modalInput) {
+                modalInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') verifyActivityCode();
+                });
+            }
+
+            const genName = document.getElementById('member-name-input');
+            const genCourse = document.getElementById('member-course-input');
+            const genYear = document.getElementById('member-year-select');
+            const genLi = document.getElementById('member-linkedin-input');
+            const teamCheckboxes = document.querySelectorAll('input[name="team"]');
+            const photoInput = document.getElementById('member-photo-input');
+            const dropzone = document.getElementById('photo-dropzone');
+
+            [genName, genCourse, genLi].forEach(inp => {
+                if (inp) inp.addEventListener('input', updateLiveCard);
+            });
+            if (genYear) genYear.addEventListener('change', updateLiveCard);
+            teamCheckboxes.forEach(cb => cb.addEventListener('change', updateLiveCard));
+
+            if (photoInput) {
+                photoInput.addEventListener('change', (e) => {
+                    if (e.target.files && e.target.files[0]) handlePhoto(e.target.files[0]);
+                });
+            }
+
+            if (dropzone) {
+                ['dragover', 'dragenter'].forEach(ev => {
+                    dropzone.addEventListener(ev, (e) => e.preventDefault());
+                });
+                dropzone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                        if (photoInput) photoInput.files = e.dataTransfer.files;
+                        handlePhoto(e.dataTransfer.files[0]);
+                    }
+                });
+            }
+
+            loadSavedState();
+        });
+    </script>
+</body>
+
+</html>
